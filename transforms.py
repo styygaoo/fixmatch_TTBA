@@ -77,18 +77,19 @@ class ToTensor(object):
         self.maxDepth = maxDepth
 
     def __call__(self, sample):
-        weak, strong, depth = sample['weak'], sample['strong'], sample['depth']
+        image, weak, strong, depth = sample['image'], sample['weak'], sample['strong'], sample['depth']
         transformation = transforms.ToTensor()                  #  (H x W x C) -->(C x H x W)
 
         if self.test:
             """
             If test, move image to [0,1] and depth to [0, 1]
             """
+            image = np.array(image).astype(np.float32) / 255.0
             weak = np.array(weak).astype(np.float32) / 255.0
             strong = np.array(strong).astype(np.float32) / 255.0
             depth = np.array(depth).astype(np.float32) #/ self.maxDepth #Why / maxDepth?
 
-            weak, strong, depth = transformation(weak), transformation(strong), transformation(depth)
+            image, weak, strong, depth = transformation(image), transformation(weak), transformation(strong), transformation(depth)
 
         else:
             #Fix for PLI=8.3.0
@@ -106,9 +107,10 @@ class ToTensor(object):
         #print('Depth after, min: {} max: {}'.format(depth.min(), depth.max()))
         #print('Image, min: {} max: {}'.format(image.min(), image.max()))
         # print(image)
+        image = torch.clamp(image, 0.0, 1.0)
         weak = torch.clamp(weak, 0.0, 1.0)
         strong = torch.clamp(strong, 0.0, 1.0)
-        return {'weak': weak, 'strong': strong, 'depth': depth}
+        return {'image': image, 'weak': weak, 'strong': strong, 'depth': depth}
 
 
 

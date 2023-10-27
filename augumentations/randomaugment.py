@@ -153,16 +153,16 @@ def fixmatch_augment_pool():
     # FixMatch paper
     augs = [# (AutoContrast, None, None),
             (Brightness, 0.5, 0.5), # not suitable for depth estimation
-            (Color, 0.9, 0.05),
-            (Contrast, 0.5, 0.2),
+            # (Color, 0.9, 0.05),
+            # (Contrast, 0.5, 0.2),
             # (Equalize, None, None), # not work
             # (Identity, None, None),
             (Posterize, 4, 4),
             # (Rotate, 30, 0), # not suitable for depth estimation
-            (Sharpness, 0.9, 0.05),
+            # (Sharpness, 0.9, 0.05),
             # (ShearX, 0.3, 0),   # not suitable for depth estimation
             # (ShearY, 0.3, 0),   # not suitable for depth estimation
-            (Solarize, 256, 20),
+            # (Solarize, 256, 20),
             # (TranslateX, 0.3, 0), # not suitable for depth estimation
             # (TranslateY, 0.3, 0)   # not suitable for depth estimation
             ]

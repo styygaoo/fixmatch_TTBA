@@ -23,13 +23,12 @@ class TTBA(nn.Module):
         # self.model_state, self.optimizer_state = \
         #     copy_model_and_optimizer(self.model, self.optimizer)
 
-    def forward(self, weak, strong):
+    def forward(self, image, weak, strong):
         if self.episodic:
             self.reset()
 
         for _ in range(self.steps):
-            outputs = forward_and_adapt(weak, strong, self.model, self.optimizer)
-
+            outputs = forward_and_adapt(image, weak, strong, self.model, self.optimizer)
         return outputs
 
     def reset(self):
@@ -39,25 +38,24 @@ class TTBA(nn.Module):
                                  self.model_state, self.optimizer_state)
 
 @torch.enable_grad()  # ensure grads in possible no grad context for testing
-def forward_and_adapt(weak, strong, model, optimizer):
+def forward_and_adapt(image, weak, strong, model, optimizer):
     """Forward and adapt model on batch of data.
-
-    Measure entropy of the model prediction, take gradients, and update params.
+       take gradients, and update params.
     """
     # forward
-    optimizer.zero_grad()
     predictions_weaks = model(weak)
     predictions_strongs = model(strong)
+    # predictions_weaks = predictions_weaks.detach()   # detach the target before computing the loss  https://stackoverflow.com/questions/72590591/the-derivative-for-target-is-not-implemented
 
-    predictions_weaks = predictions_weaks.detach()   # detach the target before computing the loss  https://stackoverflow.com/questions/72590591/the-derivative-for-target-is-not-implemented
     # adapt
     loss = torch.nn.L1Loss()
     loss = loss(predictions_strongs, predictions_weaks)
-
     print("loss: ", loss)
     loss.backward()
     optimizer.step()
-    return predictions_weaks, predictions_strongs
+    optimizer.zero_grad()
+    prediction = model(image)
+    return prediction
 
 
 def copy_model_and_optimizer(model, optimizer):

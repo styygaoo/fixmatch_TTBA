@@ -35,15 +35,16 @@ class VKITTI(Dataset):
         data = self.transform_fixmatch(data)
 
         # image, depth = data['image'], data['depth']
-        weak, strong, depth = data['weak'], data['strong'], data['depth']
+        image, weak, strong, depth = data['image'], data['weak'], data['strong'], data['depth']
 
         # print(image.shape)
+        image = np.array((image))
         weak = np.array(weak)
         strong = np.array(strong)
         depth = np.array(depth)
 
         # print(depth)
-        return weak, strong, depth
+        return image, weak, strong, depth
 
 
 

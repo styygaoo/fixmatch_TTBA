@@ -7,19 +7,21 @@ import matplotlib.pyplot as plt
 
 def unpack_and_move(data):
     if isinstance(data, (tuple, list)):
-        weak = data[0].to(device, non_blocking=True)
-        strong = data[1].to(device, non_blocking=True)
-        gt = data[2].to(device, non_blocking=True)
-        return weak, strong, gt
+        image = data[0].to(device, non_blocking=True)
+        weak = data[1].to(device, non_blocking=True)
+        strong = data[2].to(device, non_blocking=True)
+        gt = data[3].to(device, non_blocking=True)
+        return image, weak, strong, gt
     if isinstance(data, dict):
         # print("hier")
         keys = data.keys()
+        image = data['image'].to(device, non_blocking=True)
         weak = data['weak'].to(device, non_blocking=True)
         strong = data['strong'].to(device, non_blocking=True)
         gt = data['depth'].to(device, non_blocking=True)
         # print(image.shape)
         # print(gt.shape)
-        return weak, strong, gt
+        return image, weak, strong, gt
     print('Type not supported')
 
 def inverse_depth_norm(depth):
@@ -60,10 +62,10 @@ class TransformFixMatch(object):
         self.crop = transforms.CenterCrop((192, 640))
 
         self.weak = transforms.Compose([
-            #transforms.RandomHorizontalFlip(),
+            transforms.RandomVerticalFlip(p=1),
             transforms.CenterCrop(size=(192, 640))])
         self.strong = transforms.Compose([
-            #transforms.RandomHorizontalFlip(),
+            transforms.RandomVerticalFlip(p=1),
             transforms.CenterCrop(size=(192, 640)),
             RandAugmentMC(n=2, m=10)])
 
@@ -79,17 +81,15 @@ class TransformFixMatch(object):
         if isinstance(depth, np.ndarray):
             depth = Image.fromarray(depth)
             # print(np.array(depth))
+
         weak = self.weak(image)
         # plt.imshow(weak)
         # plt.show()
         strong = self.strong(image)
-        # print(np.array(depth))
-        depth = self.crop(depth)
-        # print(np.array(depth))
         # plt.imshow(strong)
         # plt.show()
-
-        return {'weak': weak, 'strong': strong, 'depth': depth}
+        # depth = self.crop(depth)
+        return {'image': image, 'weak': weak, 'strong': strong, 'depth': depth}
 
 
 
