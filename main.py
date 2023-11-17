@@ -29,8 +29,9 @@ params, param_names = collect_params(model)
 
 
 # Prepare test dataloader for TTA
-testset = VKITTI('/HOMES/yigao/KITTI/vkitti_testset_test/test', (192, 640))
-testset_loader = DataLoader(testset, batch_size=2, shuffle=False, num_workers=1, pin_memory=True, drop_last=True)       # , drop_last=True
+# testset = VKITTI('/HOMES/yigao/KITTI/vkitti_testset_test/test', (192, 640))
+testset = VKITTI('/HOMES/yigao/KITTI/sclaing_factor_dataset/', (192, 640))
+testset_loader = DataLoader(testset, batch_size=4, shuffle=False, num_workers=1, pin_memory=True, drop_last=True)       # , drop_last=True
 
 #
 # # Define loss function and optimizer for fine-tuning
@@ -77,6 +78,7 @@ for epoch in range(10):
 
         data_time = time.time() - t0
         t0 = time.time()
+        print("{:.3f}MB allocated".format(torch.cuda.memory_allocated() / 1024 ** 2))
         prediction = adapted_model(batched_images, batched_weaks, batched_strongs)
         prediction = prediction.detach()    # memory management
         prediction = inverse_depth_norm(prediction)

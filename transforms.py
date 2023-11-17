@@ -110,6 +110,7 @@ class ToTensor(object):
         image = torch.clamp(image, 0.0, 1.0)
         weak = torch.clamp(weak, 0.0, 1.0)
         strong = torch.clamp(strong, 0.0, 1.0)
+        depth = torch.clamp(depth, 0.0, 80)
         return {'image': image, 'weak': weak, 'strong': strong, 'depth': depth}
 
 

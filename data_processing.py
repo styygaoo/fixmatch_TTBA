@@ -3,7 +3,7 @@ import numpy as np
 from torchvision import transforms
 from PIL import Image
 from augumentations.randomaugment import RandAugmentMC
-import matplotlib.pyplot as plt
+
 
 def unpack_and_move(data):
     if isinstance(data, (tuple, list)):
